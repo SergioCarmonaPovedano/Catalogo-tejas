@@ -658,6 +658,62 @@
                 /* icon oculto en pantallas pequeñas también */
                 .nav-btn .icon { display:none; }
         }
+
+        /* Free-shipping floating banner styles */
+        #free-shipping-banner {
+            position: fixed;
+            bottom: 22px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 12000;
+            width: min(1100px, calc(100% - 40px));
+            pointer-events: auto;
+        }
+        #free-shipping-banner .fs-inner{
+            background: linear-gradient(90deg, rgba(40,58,86,0.95), rgba(32,44,66,0.95));
+            color: #fff;
+            padding: 12px 48px 12px 18px;
+            border-radius: 999px;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.03);
+            overflow: hidden;
+            position: relative;
+        }
+        #free-shipping-banner .fs-marquee{
+            display: inline-block;
+            white-space: nowrap;
+            will-change: transform;
+            animation: fs-marquee 12s linear infinite;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 16px;
+            letter-spacing: 0.02em;
+        }
+        @keyframes fs-marquee{
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        #free-shipping-banner .fs-close{
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            color: rgba(255,255,255,0.9);
+            border: none;
+            font-size: 20px;
+            line-height: 1;
+            padding: 8px 10px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+        #free-shipping-banner .fs-close:focus{ outline: 2px solid rgba(255,255,255,0.2); }
+
+        @media (max-width: 600px){
+            #free-shipping-banner { bottom: 14px; width: calc(100% - 28px); }
+            #free-shipping-banner .fs-inner{ padding: 10px 40px 10px 12px; }
+            #free-shipping-banner .fs-marquee{ font-size: 13px; animation-duration: 10s; }
+            #free-shipping-banner .fs-close{ font-size: 18px; }
+        }
+
     </style>
   <style>@view-transition { navigation: auto; }</style>
     <script>
@@ -677,7 +733,14 @@
   <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
  </head>
  <body>
-  <div class="scale-fallback">
+    <!-- Free shipping banner - floating, responsive, non-intrusive -->
+    <div id="free-shipping-banner" role="region" aria-label="Anuncio envío gratuito">
+        <div class="fs-inner">
+            <div class="fs-marquee">Disfruta de envío gratuito en compras superiores a 200€ — ¡Aprovecha ahora!</div>
+        </div>
+        <button class="fs-close" aria-label="Cerrar anuncio">×</button>
+    </div>
+    <div class="scale-fallback">
   <div class="container"><!-- Página Principal -->
    <div id="home" class="page active">
     <header class="header">
@@ -1013,6 +1076,22 @@
   </div>
   </div>
   <script>
+        // Small script to handle free-shipping banner close action
+        (function(){
+            try{
+                const banner = document.getElementById('free-shipping-banner');
+                if(!banner) return;
+                const btn = banner.querySelector('.fs-close');
+                btn.addEventListener('click', function(){
+                    banner.style.display = 'none';
+                });
+                // Pause marquee on hover for accessibility
+                const marquee = banner.querySelector('.fs-marquee');
+                banner.addEventListener('mouseenter', ()=> marquee.style.animationPlayState = 'paused');
+                banner.addEventListener('mouseleave', ()=> marquee.style.animationPlayState = 'running');
+            }catch(e){/* ignore in older browsers */}
+        })();
+
         // Configuración por defecto
         const defaultConfig = {
             shop_name: "Tejón Shop",
